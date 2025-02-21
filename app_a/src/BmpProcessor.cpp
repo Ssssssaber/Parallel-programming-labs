@@ -15,9 +15,9 @@ static std::vector<Pixel>& ImageDataToPixelArray(unsigned char* imageData, int w
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             Pixel px {
-                .r = imageData[y * width * channels + x * channels],    
-                .g = imageData[y * width * channels + x * channels + 1],
-                .b = imageData[y * width * channels + x * channels + 2],
+                .R = imageData[y * width * channels + x * channels],    
+                .G = imageData[y * width * channels + x * channels + 1],
+                .B = imageData[y * width * channels + x * channels + 2],
             };
             pixelArray->push_back(px);
         }
@@ -32,9 +32,9 @@ static unsigned char* PixelArrayToImageData(const std::vector<Pixel>& pixelArray
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            imageData[y * width * channels + x * channels] = pixelArray[y * width + x].r;
-            imageData[y * width * channels + x * channels + 1] = pixelArray[y * width + x].g;
-            imageData[y * width * channels + x * channels + 2] = pixelArray[y * width + x].b;
+            imageData[y * width * channels + x * channels] = pixelArray[y * width + x].R;
+            imageData[y * width * channels + x * channels + 1] = pixelArray[y * width + x].G;
+            imageData[y * width * channels + x * channels + 2] = pixelArray[y * width + x].B;
         }
     }
 
@@ -127,9 +127,9 @@ void BmpProcessor::PerformIntencityStep(int x, int y)
             
             if (pixelX < 0 || pixelX >= _width || pixelY < 0 || pixelY >= _height) continue;
 
-            rSum += _initialPixelArray[pixelY * _width + pixelX].r * _convCore[convY][convX];
-            gSum += _initialPixelArray[pixelY * _width + pixelX].g * _convCore[convY][convX];
-            bSum += _initialPixelArray[pixelY * _width + pixelX].b * _convCore[convY][convX];
+            rSum += _initialPixelArray[pixelY * _width + pixelX].R * _convCore[convY][convX];
+            gSum += _initialPixelArray[pixelY * _width + pixelX].G * _convCore[convY][convX];
+            bSum += _initialPixelArray[pixelY * _width + pixelX].B * _convCore[convY][convX];
             weightSum += _convCore[convY][convX];
         }
     }
@@ -148,9 +148,9 @@ void BmpProcessor::PerformIntencityStep(int x, int y)
     if (bSum < 0) bSum = 0;
     if (bSum > 255) bSum = 255;
     
-    _convPixelArray[y * _width + x].r = rSum;
-    _convPixelArray[y * _width + x].g = gSum;
-    _convPixelArray[y * _width + x].b = bSum;
+    _convPixelArray[y * _width + x].R = rSum;
+    _convPixelArray[y * _width + x].G = gSum;
+    _convPixelArray[y * _width + x].B = bSum;
 }
 
 
@@ -166,9 +166,9 @@ void BmpProcessor::PerformMinimizationStep(int x, int y)
             
             if (pixelX < 0 || pixelX >= _width || pixelY < 0 || pixelY >= _height) continue;
 
-            rSum += _convPixelArray[pixelY * _width + pixelX].r;
-            gSum += _convPixelArray[pixelY * _width + pixelX].g;
-            bSum += _convPixelArray[pixelY * _width + pixelX].b;
+            rSum += _convPixelArray[pixelY * _width + pixelX].R;
+            gSum += _convPixelArray[pixelY * _width + pixelX].G;
+            bSum += _convPixelArray[pixelY * _width + pixelX].B;
 
             weightSum += 1;
         }
@@ -188,9 +188,9 @@ void BmpProcessor::PerformMinimizationStep(int x, int y)
     
     int minimY = y / _minimizationScale;
     int minimX = x / _minimizationScale;
-    _resultPixelArray[minimY * _minimizedWidth + minimX].r = rSum;
-    _resultPixelArray[minimY * _minimizedWidth + minimX].g = gSum;
-    _resultPixelArray[minimY * _minimizedWidth + minimX].b = bSum;
+    _resultPixelArray[minimY * _minimizedWidth + minimX].R = rSum;
+    _resultPixelArray[minimY * _minimizedWidth + minimX].G = gSum;
+    _resultPixelArray[minimY * _minimizedWidth + minimX].B = bSum;
 }
 
 void BmpProcessor::SaveFile(const std::string& filename)

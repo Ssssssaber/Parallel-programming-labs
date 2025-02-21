@@ -14,11 +14,11 @@ static std::vector<Pixel>& ImageDataToPixelArray(unsigned char* imageData, int w
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            Pixel px {
-                .r = imageData[y * width * channels + x * channels],    
-                .g = imageData[y * width * channels + x * channels + 1],
-                .b = imageData[y * width * channels + x * channels + 2],
-            };
+            Pixel px(
+                (int)imageData[y * width * channels + x * channels],    
+                (int)imageData[y * width * channels + x * channels + 1],
+                (int)imageData[y * width * channels + x * channels + 2]
+            );
             pixelArray->push_back(px);
         }
     }
@@ -32,9 +32,9 @@ static unsigned char* PixelArrayToImageData(const std::vector<Pixel>& pixelArray
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            imageData[y * width * channels + x * channels] = pixelArray[y * width + x].r;
-            imageData[y * width * channels + x * channels + 1] = pixelArray[y * width + x].g;
-            imageData[y * width * channels + x * channels + 2] = pixelArray[y * width + x].b;
+            imageData[y * width * channels + x * channels] = pixelArray[y * width + x].R;
+            imageData[y * width * channels + x * channels + 1] = pixelArray[y * width + x].G;
+            imageData[y * width * channels + x * channels + 2] = pixelArray[y * width + x].B;
         }
     }
 
@@ -94,9 +94,9 @@ void BmpProcessor::ProcessImage(int startLine, int endLine)
     {
         for (int x = 0; x < _width; x++) 
         {
-            int intensity = (_initialPixelArray[y * _width + x].r +
-                             _initialPixelArray[y * _width + x].r +
-                             _initialPixelArray[y * _width + x].r) / 3;
+            int intensity = (_initialPixelArray[y * _width + x].R +
+                             _initialPixelArray[y * _width + x].R +
+                             _initialPixelArray[y * _width + x].R) / 3;
             
             if (intensity > _intencityThreshold) _thresholdArray[y * _width + x] = 1;
             else _thresholdArray[y * _width + x] = 0;
@@ -107,14 +107,27 @@ void BmpProcessor::ProcessImage(int startLine, int endLine)
     {
         for (int x = 0; x < _width; x ++) 
         {
-            Pixel px {
-                .r = _thresholdArray[y * _width + x] * 255,    
-                .g = _thresholdArray[y * _width + x] * 255,
-                .b = _thresholdArray[y * _width + x] * 255,
-            };
-            _resultPixelArray[y * _width + x] = px;
+            if (PerformErosion(x, y)) _resultPixelArray[y * _width + x].SetAll(25);
+            else _resultPixelArray[y * _width + x].SetAll(230);
         }
     }
+}
+
+bool BmpProcessor::PerformErosion(int x, int y)
+{
+    for (int coreY = 0; coreY < _erosionStep; coreY++)
+    {
+        for (int coreX = 0; coreX < _erosionStep; coreX++)
+        {
+            int pixelX = x + (coreX - _erosionStep / 2);
+            int pixelY = y + (coreY - _erosionStep / 2);
+            
+            if (pixelX < 0 || pixelX >= _width || pixelY < 0 || pixelY >= _height) continue;
+
+            if (_thresholdArray[pixelY * _width + pixelX] == 1) return false;
+        }
+    }
+    return true;
 }
 
 void BmpProcessor::ProcessImageSingleThread()

@@ -6,9 +6,20 @@
 #include <chrono>
 
 struct Pixel {
-    int r;
-    int g;
-    int b;
+    int R;
+    int G;
+    int B;
+
+    Pixel() = default;
+    Pixel(int initial) : R(initial), G(initial), B(initial) {} 
+    Pixel(int r, int g, int b) : R(r), G(g), B(b) {}
+
+    void SetAll(int value)
+    {
+        R = value;
+        G = value;
+        B = value;
+    }
 };
 
 static std::vector<Pixel>& ImageDataToPixelArray(unsigned char* imageData, int width, int height, int channels);
@@ -30,8 +41,7 @@ class BmpProcessor
 
     private:
         void ProcessImage(int startLine, int endLine);
-        void PerformIntencityStep(int x, int y);
-        void PerformMinimizationStep(int x, int y);
+        bool PerformErosion(int x, int y);
 
     private:
         bool _ready = false;

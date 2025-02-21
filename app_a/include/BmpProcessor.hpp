@@ -6,9 +6,9 @@
 #include <chrono>
 
 struct Pixel {
-    int r;
-    int g;
-    int b;
+    int R;
+    int G;
+    int B;
 };
 
 static std::vector<Pixel>& ImageDataToPixelArray(unsigned char* imageData, int width, int height, int channels);
