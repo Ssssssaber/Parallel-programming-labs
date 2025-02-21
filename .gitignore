@@ -1,0 +1,7 @@
+build/
+bin/
+images/*
+
+.vscode/
+
+!/images/example.bmp
