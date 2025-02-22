@@ -11,12 +11,4 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${FullOutputDir}")
 
 add_subdirectory(app_a)
 add_subdirectory(app_b)
-
-# add_custom_command(
-#   TARGET parallel_2
-#   POST_BUILD
-#   COMMAND ${CMAKE_COMMAND}
-#   ARGS -E copy_directory_if_different "${CMAKE_CURRENT_SOURCE_DIR}/images/" "${FullOutputDir}/images/"
-#   COMMENT "---- Copying Images -----"
-# )
-
+add_subdirectory(app_c)

@@ -1,38 +1,30 @@
 #include <iostream>
 
-#include "BmpProcessor.hpp"
+#include <svg-cpp-plot.h>
+#include "CsvProcessor.hpp"
 
 int main(int argc, char* argv[]){
 
-    std::string inputFilename;
-    std::string outputFilename;
-    int numThreads;
+    std::string filename;
+    // if (argc != 2)
+    // {
+    //     std::cout << "Usage: app_c.exe {input.csv}";
+    //     return EXIT_FAILURE;
+    // }
+
+    // filename = argv[1];
     
+    filename = "csv/BD-Patients.csv";
+    CsvProcessor* processor = new CsvProcessor(filename, {"Creatinine_pvariance", "HCO3_mean"});
 
-    if (argc == 2 && argv[1] == "default")
-    {
-        inputFilename = "images/example.bmp";
-        outputFilename = "res.bmp";
-        numThreads = 4;
-    }
-    else if (argc != 4) 
-    {
-        std::cout << "Usage: img_process.exe {input.bmp} {output.bmp} {numThreads}";
-        return EXIT_FAILURE;
-	}
-    else 
-    {
-        inputFilename = argv[1];
-        outputFilename = argv[2];
-        numThreads = std::stoi(argv[3]);
-    }
+    auto first = processor->GetColumn("Creatinine_pvariance");
+    auto second = processor->GetColumn("HCO3_mean");
 
-    BmpProcessor* processor = new BmpProcessor(inputFilename);
+    std::cout << *std::max_element(first.begin(), first.end()) << "; " << *std::max_element(second.begin(), second.end());
+    svg_cpp_plot::SVGPlot plt;
+    plt.subplot(1, 1, 0).xlabel("keke").ylabel("keke").scatter(first, second);
+    plt.savefig("teaser.svg");
 
-    if (!processor->GetIsReady()) return EXIT_FAILURE;
 
-    processor->ProcessImageMultithread(numThreads);
-    processor->SaveFile(outputFilename);
-    
-    std::cout << "File (" << outputFilename << ") saved \n";
+    // if (processor->getIs
 }

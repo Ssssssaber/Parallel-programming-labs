@@ -7,12 +7,12 @@ int main(int argc, char* argv[]){
     std::string inputFilename;
     std::string outputFilename;
     int numThreads;
-    int intencityThreshold;
-    int erosionStep;
+    int intencityThreshold = 100;
+    int erosionStep = 2;
     
     if (argc != 4 && argc != 6) 
     {
-        std::cout << "Usage: img_process.exe {input.bmp} {output.bmp} {numThreads} [intencityThreshold] [erosionStep]";
+        std::cout << "Usage: app_b.exe {input.bmp} {output.bmp} {numThreads} [intencityThreshold] [erosionStep]";
         return EXIT_FAILURE;
 	}
     else
@@ -27,12 +27,6 @@ int main(int argc, char* argv[]){
         intencityThreshold = std::atoi(argv[4]);
         erosionStep = std::atoi(argv[5]);
     }
-
-    // inputFilename = "images/tales.bmp";
-    // outputFilename = "res.bmp";
-    // numThreads = 16;
-    // intencityThreshold = 100;
-    // erosionStep = 10;
 
     BmpProcessor* processor = new BmpProcessor(inputFilename, intencityThreshold, erosionStep);
 

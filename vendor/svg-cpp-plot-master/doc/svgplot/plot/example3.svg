@@ -1,0 +1,80 @@
+<svg viewBox="0 0 640 480" height="100%" width="100%" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="id0000000068" >
+<g id="id0000000069" >
+<clipPath id="id0000000069clipper" >
+<polygon points="36,1 36,458 639,458 639,1 " id="id0000000072" class="rectangle" />
+</clipPath>
+
+<g clip-path="url(#id0000000069clipper)" id="id0000000071" >
+<polyline id="id0000000073" points="36,89.1235 42.0909,369.436 48.1818,87.7219 54.2727,370.844 60.3636,86.3063 66.4545,372.267 72.5454,84.8765 78.6364,373.704 84.7273,83.4324 90.8182,375.155 96.9091,81.9738 103,376.621 109.091,80.5005 115.182,378.102 121.273,79.0125 127.364,379.597 133.455,77.5096 139.545,381.108 145.636,75.9916 151.727,382.633 157.818,74.4584 163.909,384.174 170,72.9099 176.091,385.731 182.182,71.3457 188.273,387.303 194.364,69.766 200.454,388.89 206.545,68.1704 212.636,390.494 218.727,66.5587 224.818,392.113 230.909,64.931 237,393.749 243.091,63.2869 249.182,395.402 255.273,61.6263 261.364,397.071 267.454,59.9491 273.545,398.756 279.636,58.2551 285.727,400.459 291.818,56.544 297.909,402.178 304,54.8158 310.091,403.915 316.182,53.0703 322.273,405.669 328.363,51.3074 334.454,407.441 340.545,49.5267 346.636,409.231 352.727,47.7282 358.818,411.038 364.909,45.9116 371,412.864 377.091,44.0769 383.182,414.708 389.272,42.2237 395.363,416.57 401.454,40.352 407.545,418.451 413.636,38.4615 419.727,420.351 425.818,36.552 431.909,422.27 438,34.6235 444.091,424.208 450.181,32.6755 456.272,426.166 462.363,30.7081 468.454,428.143 474.545,28.7209 480.636,430.141 486.727,26.7138 492.818,432.158 498.909,24.6866 505,434.195 511.091,22.639 517.181,436.253 523.272,20.571 529.363,438.331 535.454,18.4822 541.545,440.43 547.636,16.3724 553.727,442.551 559.818,14.2415 565.909,444.692 572,12.0893 578.091,446.855 584.182,9.91547 590.273,449.04 596.363,7.71983 602.454,451.247 608.545,5.50218 614.636,453.475 620.727,3.26233 626.818,455.726 632.909,1 639,458 " fill="none" stroke-opacity="1.000000" stroke-linecap="round" stroke="#1f77b4" stroke-width="1.000000" />
+</g>
+
+<polygon points="36,1 36,458 639,458 639,1 " stroke="black" stroke-width="1.000000" fill="none" id="id0000000074" pointer-events="none" class="rectangle" />
+<polyline points="36,458 36,461 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000075" class="line" />
+<text id="id0000000076" transform="matrix(1 0 0 1 36 1)" x="0.000000" y="462.000000" dominant-baseline="hanging" text-anchor="middle" font-size="14.000000px" >
+0
+</text>
+
+<polyline points="157.818,458 157.818,461 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000077" class="line" />
+<text id="id0000000078" transform="matrix(1 0 0 1 36 1)" x="121.818161" y="462.000000" dominant-baseline="hanging" text-anchor="middle" font-size="14.000000px" >
+1
+</text>
+
+<polyline points="279.636,458 279.636,461 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000079" class="line" />
+<text id="id0000000080" transform="matrix(1 0 0 1 36 1)" x="243.636322" y="462.000000" dominant-baseline="hanging" text-anchor="middle" font-size="14.000000px" >
+2
+</text>
+
+<polyline points="401.454,458 401.454,461 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000081" class="line" />
+<text id="id0000000082" transform="matrix(1 0 0 1 36 1)" x="365.454498" y="462.000000" dominant-baseline="hanging" text-anchor="middle" font-size="14.000000px" >
+3
+</text>
+
+<polyline points="523.273,458 523.273,461 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000083" class="line" />
+<text id="id0000000084" transform="matrix(1 0 0 1 36 1)" x="487.272644" y="462.000000" dominant-baseline="hanging" text-anchor="middle" font-size="14.000000px" >
+4
+</text>
+
+<polyline points="645.091,458 645.091,461 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000085" class="line" />
+<text id="id0000000086" transform="matrix(1 0 0 1 36 1)" x="609.090820" y="462.000000" dominant-baseline="hanging" text-anchor="middle" font-size="14.000000px" >
+5
+</text>
+
+<polyline points="33,437.597 36,437.597 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000087" class="line" />
+<text id="id0000000088" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="436.596863" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+-1.5
+</text>
+
+<polyline points="33,368.041 36,368.041 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000089" class="line" />
+<text id="id0000000090" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="367.041290" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+-1
+</text>
+
+<polyline points="33,298.486 36,298.486 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000091" class="line" />
+<text id="id0000000092" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="297.485718" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+-0.5
+</text>
+
+<polyline points="33,228.93 36,228.93 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000093" class="line" />
+<text id="id0000000094" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="227.930161" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+0
+</text>
+
+<polyline points="33,159.375 36,159.375 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000095" class="line" />
+<text id="id0000000096" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="158.374603" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+0.5
+</text>
+
+<polyline points="33,89.8191 36,89.8191 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000097" class="line" />
+<text id="id0000000098" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="88.819061" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+1
+</text>
+
+<polyline points="33,20.2635 36,20.2635 " fill="none" stroke-width="1.000000" stroke="black" id="id0000000099" class="line" />
+<text id="id0000000100" transform="matrix(1 0 0 1 36 1)" x="-5.000000" y="19.263489" dominant-baseline="middle" text-anchor="end" font-size="14.000000px" >
+1.5
+</text>
+
+
+</g>
+
+</svg>

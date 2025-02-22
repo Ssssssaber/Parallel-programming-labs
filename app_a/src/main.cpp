@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
 
     if (argc != 4) 
     {
-        std::cout << "Usage: img_process.exe {input.bmp} {output.bmp} {numThreads}";
+        std::cout << "Usage: app_b.exe {input.bmp} {output.bmp} {numThreads}";
         return EXIT_FAILURE;
 	}
     else 
