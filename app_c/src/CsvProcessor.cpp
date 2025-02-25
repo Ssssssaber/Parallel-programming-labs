@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include "float.h"
+#include <numeric>
 
 bool is_number(const std::string& s)
 {
@@ -99,6 +100,59 @@ void CsvProcessor::ReadFileAndNormalize(const std::string& filename, std::vector
     ClampToOne(points, maxX, maxY);
 
     _ready = true;
+}
+
+double MeanDistanceToCluster(Point& point, Cluster& cluster)
+{
+    double mean;
+    for (auto it = cluster.Points.begin(); it != cluster.Points.end(); it++)
+    {
+        mean += point.Distance(*it);
+    }
+
+    return mean / cluster.Points.size();
+}
+
+double CsvProcessor::CalculateSilhouette(uint32_t K, int pointsCount)
+{
+    std::vector<double> a;
+    a.resize(pointsCount);
+    std::vector<double> b;
+    b.resize(pointsCount);
+    
+    std::vector<double> temp;
+    temp.resize(K - 1);
+    
+    for (int i = 0; i < pointsCount; i++)
+    {
+        int jindex = 0;
+        for (auto cluster = _clusters.begin(); cluster != _clusters.end(); cluster++)
+        {
+            if (_points[i].ClusterId == cluster->Id)
+            {
+                a[i] = MeanDistanceToCluster(_points[i], *cluster);
+            }
+            else
+            {
+                temp[jindex++] = MeanDistanceToCluster(_points[i], *cluster);
+            }
+        }
+
+        b[i] = *std::min_element(temp.begin(), temp.end());
+    }
+    
+    std::vector<double> s;
+    s.resize(pointsCount);
+    double maxim;
+    for (int i = 0; i < pointsCount; i++)
+    {
+        if (a[i] > b[i]) maxim = a[i];
+        else maxim = b[i];
+
+        s[i] = (a[i] - b[i]) / maxim;
+    }
+
+    return std::accumulate(s.begin(), s.end(), 0.0) / pointsCount;
 }
 
 int CsvProcessor::GetNearestClusterId(Point& point)
@@ -275,6 +329,7 @@ void CsvProcessor::PerformClusterization(uint32_t K, uint8_t threadCount)
         }
         iter++;
     }
+    std::cout << "Silhouette: " << CalculateSilhouette(K, pointsCount);
     _tsEnd= std::chrono::steady_clock::now();
     std::cout << "Ended processing. Time elapsed: " << 
         std::chrono::duration_cast<std::chrono::milliseconds>(_tsEnd - _tsBegin).count() << " ms (" <<

@@ -56,6 +56,9 @@ class CsvProcessor
     private:
         void ReadFileAndNormalize(const std::string& filename, std::vector<Point>& points, GraphInfo& info);
         void ClampToOne(std::vector<Point>& points, double maxX, double maxY);
+
+        
+        double CalculateSilhouette(uint32_t K, int pointsCount);
         
         void CalculateNearestClusterForDots(uint32_t start, uint32_t end);
         int GetNearestClusterId(Point& point);
