@@ -30,7 +30,7 @@ std::vector<std::string> split(std::string& s, std::string delimiter) {
     return res;
 }
 
-CsvProcessor::CsvProcessor(const std::string& filename, const std::string& columnXName, const std::string& columnYName)
+CsvProcessor::CsvProcessor(const std::string& filename, const std::string& columnXName, const std::string& columnYName, uint64_t maxVectorCount)
 {
     _graphInfo.LabelX = columnXName;
     _graphInfo.LabelY = columnYName;
@@ -38,6 +38,7 @@ CsvProcessor::CsvProcessor(const std::string& filename, const std::string& colum
     std::cout << "Starting to parse file " << filename << " for columns " << columnXName << " and " << columnYName << std::endl;
 
     ReadFileAndNormalize(filename, _points, _graphInfo);
+    CutToVectorCount(maxVectorCount);
 }
 
 void CsvProcessor::ReadFileAndNormalize(const std::string& filename, std::vector<Point>& points, GraphInfo& info)
@@ -102,6 +103,11 @@ void CsvProcessor::ReadFileAndNormalize(const std::string& filename, std::vector
     _ready = true;
 }
 
+void CsvProcessor::CutToVectorCount(uint64_t vectorCount)
+{
+    _points.resize(vectorCount);
+}
+
 double MeanDistanceToCluster(Point& point, Cluster& cluster)
 {
     double mean;
@@ -113,17 +119,11 @@ double MeanDistanceToCluster(Point& point, Cluster& cluster)
     return mean / cluster.Points.size();
 }
 
-double CsvProcessor::CalculateSilhouette(uint32_t K, int pointsCount)
+void CsvProcessor::CalculateDissimalarityAndSimilarity(uint32_t start, uint32_t end, uint32_t K, int pointsCount)
 {
-    std::vector<double> a;
-    a.resize(pointsCount);
-    std::vector<double> b;
-    b.resize(pointsCount);
-    
     std::vector<double> temp;
     temp.resize(K - 1);
-    
-    for (int i = 0; i < pointsCount; i++)
+    for (int i = start; i < end; i++)
     {
         int jindex = 0;
         for (auto cluster = _clusters.begin(); cluster != _clusters.end(); cluster++)
@@ -140,6 +140,36 @@ double CsvProcessor::CalculateSilhouette(uint32_t K, int pointsCount)
 
         b[i] = *std::min_element(temp.begin(), temp.end());
     }
+}
+
+double CsvProcessor::CalculateSilhouette(uint32_t K, int pointsCount, uint8_t threadCount)
+{
+    a.resize(pointsCount);
+    b.resize(pointsCount);
+
+    if (threadCount == 1)
+    {
+        CalculateDissimalarityAndSimilarity(0, pointsCount, K, pointsCount);
+    }
+    else
+    {
+        int step = pointsCount / threadCount;
+        for (int i = 0; i < threadCount; i++)
+        {
+            int start = i * step;
+            int end = (i + 1) * step + 1;
+            if (i == threadCount - 1) end = pointsCount;
+            _threads.push_back(std::thread(&CsvProcessor::CalculateDissimalarityAndSimilarity, this, start, end, K, pointsCount));
+        }
+    
+        for (auto& thread : _threads)
+        {
+            if (thread.joinable()) thread.join();
+        }
+
+        _threads.clear();
+    }
+   
     
     std::vector<double> s;
     s.resize(pointsCount);
@@ -229,7 +259,8 @@ void CsvProcessor::RecalculateClusterCentroids(uint32_t clusterId, uint32_t K, u
 
 void CsvProcessor::PerformClusterization(uint32_t K, uint8_t threadCount)
 {
-    std::cout << "Started processing with " << threadCount << " thread(s)" << std::endl;
+    std::cout << "---------------------------------------------------------" << std::endl;
+    std::cout << "Started processing with " << (int)threadCount << " thread(s)" << std::endl;
     _tsBegin = std::chrono::steady_clock::now();
 
     uint32_t pointsCount = _points.size();
@@ -329,7 +360,9 @@ void CsvProcessor::PerformClusterization(uint32_t K, uint8_t threadCount)
         }
         iter++;
     }
-    std::cout << "Silhouette: " << CalculateSilhouette(K, pointsCount);
+
+    std::cout << "---------------------------------------------------------" << std::endl;
+    std::cout << "Silhouette: " << CalculateSilhouette(K, pointsCount, threadCount) << std::endl;
     _tsEnd= std::chrono::steady_clock::now();
     std::cout << "Ended processing. Time elapsed: " << 
         std::chrono::duration_cast<std::chrono::milliseconds>(_tsEnd - _tsBegin).count() << " ms (" <<

@@ -47,7 +47,7 @@ struct Cluster {
 class CsvProcessor
 {
     public:
-        CsvProcessor(const std::string& filename, const std::string& columnX, const std::string& columnY);
+        CsvProcessor(const std::string& filename, const std::string& columnXName, const std::string& columnYName, uint64_t maxVectorCount = 5000);
         ~CsvProcessor() = default;
         bool GetIsReady() { return _ready; }
         void PerformClusterization(uint32_t K, uint8_t threadCount = 1);
@@ -55,10 +55,11 @@ class CsvProcessor
 
     private:
         void ReadFileAndNormalize(const std::string& filename, std::vector<Point>& points, GraphInfo& info);
+        void CutToVectorCount(uint64_t vectorCount);
         void ClampToOne(std::vector<Point>& points, double maxX, double maxY);
 
-        
-        double CalculateSilhouette(uint32_t K, int pointsCount);
+        void CalculateDissimalarityAndSimilarity(uint32_t start, uint32_t end, uint32_t K, int pointsCount);
+        double CalculateSilhouette(uint32_t K, int pointsCount, uint8_t threadCount);
         
         void CalculateNearestClusterForDots(uint32_t start, uint32_t end);
         int GetNearestClusterId(Point& point);
@@ -79,5 +80,8 @@ class CsvProcessor
         std::vector<Point> _points;
         std::vector<Cluster> _clusters;
         GraphInfo _graphInfo;
+
+        std::vector<double> a;
+        std::vector<double> b;
 
 };
