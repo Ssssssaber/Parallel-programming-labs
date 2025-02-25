@@ -34,13 +34,9 @@ CsvProcessor::CsvProcessor(const std::string& filename, const std::string& colum
     _graphInfo.LabelX = columnXName;
     _graphInfo.LabelY = columnYName;
 
-    std::cout << "Reading file: " << filename << std::endl;
-    ReadFileAndNormalize(filename, _points, _graphInfo);
-}
+    std::cout << "Starting to parse file " << filename << " for columns " << columnXName << " and " << columnYName << std::endl;
 
-void CsvProcessor::PerformClusterization(uint32_t K)
-{
-    PerformClusterization(K, _points, _clusters);
+    ReadFileAndNormalize(filename, _points, _graphInfo);
 }
 
 void CsvProcessor::ReadFileAndNormalize(const std::string& filename, std::vector<Point>& points, GraphInfo& info)
@@ -105,9 +101,9 @@ void CsvProcessor::ReadFileAndNormalize(const std::string& filename, std::vector
     _ready = true;
 }
 
-int CsvProcessor::GetNearestClusterId(Point& point, std::vector<Cluster>& clusters)
+int CsvProcessor::GetNearestClusterId(Point& point)
 {
-    if (clusters.empty())
+    if (_clusters.empty())
     {
         std::cerr << "Clusters empty" << std::endl;
     }
@@ -115,7 +111,7 @@ int CsvProcessor::GetNearestClusterId(Point& point, std::vector<Cluster>& cluste
     double minDist = DBL_MAX;
     int nearestClusterId;
 
-    for (auto cluster = clusters.begin(); cluster != clusters.end(); cluster++)
+    for (auto cluster = _clusters.begin(); cluster != _clusters.end(); cluster++)
     {
         double dist = point.Distance(cluster->Centroid);
         if (dist < minDist) 
@@ -128,20 +124,61 @@ int CsvProcessor::GetNearestClusterId(Point& point, std::vector<Cluster>& cluste
     return nearestClusterId;
 }
 
-void CsvProcessor::ClearClusterPoints(std::vector<Cluster>& clusters)
+void CsvProcessor::ClearClusterPoints()
 {
-    for (Cluster& cluster : clusters)
+    for (Cluster& cluster : _clusters)
     {
         cluster.Points.clear();
     }
 }
 
-void CsvProcessor::PerformClusterization(uint32_t K, std::vector<Point>& points, std::vector<Cluster>& clusters)
+void CsvProcessor::CalculateNearestClusterForDots(uint32_t start, uint32_t end)
 {
-    std::cout << "Started processing " << std::endl;
+    for (int i = start; i < end; i++)
+    {
+        int currentClusterId = _points[i].ClusterId;
+        int nearestClusterId = GetNearestClusterId(_points[i]);
+
+        if (currentClusterId != nearestClusterId)
+        {
+            _points[i].ClusterId = nearestClusterId;
+            // _clusterizationDone = false;
+        }
+    }
+}
+
+void CsvProcessor::RecalculateClusterCentroids(uint32_t clusterId, uint32_t K, uint32_t pointsCount)
+{
+    // Recalculating the center of each cluster
+    for (int i = 0; i < K; i++)
+    {
+        int clusterSize = _clusters[clusterId].Points.size();
+
+        if (clusterSize < 0) 
+        {
+            continue;
+        }
+        
+        Point newCentroid;
+        for (int p = 0; p < clusterSize; p++)
+        {
+            Point& point = _clusters[clusterId].Points[p];
+            newCentroid.X += point.X;
+            newCentroid.Y += point.Y;
+        }
+        newCentroid.X /= clusterSize;
+        newCentroid.Y /= clusterSize;
+        
+        _clusters[clusterId].Centroid = newCentroid;
+    }
+}
+
+void CsvProcessor::PerformClusterization(uint32_t K, uint8_t threadCount)
+{
+    std::cout << "Started processing with " << threadCount << " thread(s)" << std::endl;
     _tsBegin = std::chrono::steady_clock::now();
 
-    uint32_t pointsCount = points.size();
+    uint32_t pointsCount = _points.size();
 
     // // Initializing Clusters
     std::vector<int> usedPointIds;
@@ -156,14 +193,14 @@ void CsvProcessor::PerformClusterization(uint32_t K, std::vector<Point>& points,
                 usedPointIds.end())
             {
                 usedPointIds.push_back(index);
-                points[index].ClusterId = i;
-                Cluster cluster(i, points[index]);
-                clusters.push_back(cluster);
+                _points[index].ClusterId = i;
+                Cluster cluster(i, _points[index]);
+                _clusters.push_back(cluster);
                 break;
             }
         }
     }
-    std::cout << "Clusters initialized = " << clusters.size() << std::endl;
+    std::cout << "Clusters initialized = " << _clusters.size() << std::endl;
 
     std::cout << "Running K-Means Clustering.." << std::endl;
 
@@ -171,65 +208,77 @@ void CsvProcessor::PerformClusterization(uint32_t K, std::vector<Point>& points,
     while (true)
     {
         std::cout << "Iter - " << iter << "/" << iters << std::endl;
-        bool done = true;
+        // _clusterizationDone = true;
 
         // Add all points to their nearest cluster
-        // #pragma omp parallel for reduction(&&: done) num_threads(16)
-        for (int i = 0; i < pointsCount; i++)
-        {
-            int currentClusterId = _points[i].ClusterId;
-            int nearestClusterId = GetNearestClusterId(points[i], clusters);
-
-            if (currentClusterId != nearestClusterId)
+        // #pragma omp parallel for reduction(&&: _clusterizationDne) num_threads(16)
+       if (threadCount == 1)
+       {
+            CalculateNearestClusterForDots(0, pointsCount);
+       }
+       else
+       {
+            int step = pointsCount / threadCount;
+            for (int i = 0; i < threadCount; i++)
             {
-                points[i].ClusterId = nearestClusterId;
-                done = false;
+                int start = i * step;
+                int end = (i + 1) * step + 1;
+                if (i == threadCount - 1) end = pointsCount;
+                _threads.push_back(std::thread(&CsvProcessor::CalculateNearestClusterForDots, this, start, end));
             }
-        }
+        
+            for (auto& thread : _threads)
+            {
+                if (thread.joinable()) thread.join();
+            }
+
+            _threads.clear();
+       }
 
         // clear all existing clusters
-        ClearClusterPoints(clusters);
+        ClearClusterPoints();
+
 
         // reassign points to their new clusters
         for (int i = 0; i < pointsCount; i++)
         {
             // cluster index is ID-1
-            clusters[points[i].ClusterId - 1].Points.push_back(points[i]);
+            _clusters[_points[i].ClusterId - 1].Points.push_back(_points[i]);
         }
 
-        // Recalculating the center of each cluster
-        for (int i = 0; i < K; i++)
+        if (threadCount == 1)
         {
-            int clusterSize = clusters[i].Points.size();
+            for (int i = 0; i < K; i++)
+            {
+                RecalculateClusterCentroids(i, K, pointsCount);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < K; i++)
+            {
+                _threads.push_back(std::thread(&CsvProcessor::RecalculateClusterCentroids, this, i, K, pointsCount));
+            }
 
-            if (clusterSize < 0) 
+            for (auto& thread : _threads)
             {
-                continue;
+                if (thread.joinable()) thread.join();
             }
-            
-            Point newCentroid;
-            for (int p = 0; p < clusterSize; p++)
-            {
-                Point& point = clusters[i].Points[p];
-                newCentroid.X += point.X;
-                newCentroid.Y += point.Y;
-            }
-            newCentroid.X /= clusterSize;
-            newCentroid.Y /= clusterSize;
-            
-            clusters[i].Centroid = newCentroid;
+
+            _threads.clear();
         }
 
-        if (done || iter >= iters)
+        if ( iter >= iters)
         {
             std::cout << "Clustering completed in iteration : " << iter << std::endl;
             break;
         }
         iter++;
     }
-    _tsEnd = std::chrono::steady_clock::now();
-    std::cout << "Ended processing. Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(_tsEnd - _tsBegin).count() << " ms" << std::endl;
-    
+    _tsEnd= std::chrono::steady_clock::now();
+    std::cout << "Ended processing. Time elapsed: " << 
+        std::chrono::duration_cast<std::chrono::milliseconds>(_tsEnd - _tsBegin).count() << " ms (" <<
+        std::chrono::duration_cast<std::chrono::nanoseconds>(_tsEnd - _tsBegin).count() << ")" << std::endl;
 }
 
 void CsvProcessor::ClampToOne(std::vector<Point>& points, double maxX, double maxY)

@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <atomic>
 
 struct GraphInfo {
     std::string LabelX = "None";
@@ -49,18 +50,21 @@ class CsvProcessor
         CsvProcessor(const std::string& filename, const std::string& columnX, const std::string& columnY);
         ~CsvProcessor() = default;
         bool GetIsReady() { return _ready; }
-        void PerformClusterization(uint32_t K);
+        void PerformClusterization(uint32_t K, uint8_t threadCount = 1);
         std::vector<Cluster> GetCluseters() { return _clusters; }
 
     private:
         void ReadFileAndNormalize(const std::string& filename, std::vector<Point>& points, GraphInfo& info);
         void ClampToOne(std::vector<Point>& points, double maxX, double maxY);
         
-        void PerformClusterization(uint32_t count, std::vector<Point>& points, std::vector<Cluster>& clusters);
-        int GetNearestClusterId(Point& point, std::vector<Cluster>& clusters);
-        void ClearClusterPoints(std::vector<Cluster>& clusters);
+        void CalculateNearestClusterForDots(uint32_t start, uint32_t end);
+        int GetNearestClusterId(Point& point);
+
+        void ClearClusterPoints();
+        void RecalculateClusterCentroids(uint32_t clusterId, uint32_t K, uint32_t pointsCount);
         
     private:
+        // std::atomic_bool _clusterizationDone = true;
         bool _ready = false;
         // threading and time
         std::vector<std::thread> _threads;
