@@ -85,7 +85,7 @@ void BmpProcessor::ProcessImageMultithread(int threadCount)
 
     _tsEnd = std::chrono::steady_clock::now();
 
-    std::cout << "Ended processing. TIme elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(_tsEnd - _tsBegin).count() << " ms" << std::endl;
+    std::cout << "Ended processing. Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(_tsEnd - _tsBegin).count() << " ms" << std::endl;
 }
 
 void BmpProcessor::ProcessImage(int startLine, int endLine)

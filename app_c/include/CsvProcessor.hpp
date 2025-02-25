@@ -5,25 +5,61 @@
 #include <map>
 #include <thread>
 #include <chrono>
+#include <cmath>
+
+struct GraphInfo {
+    std::string LabelX = "None";
+    std::string LabelY = "None";
+    int XId = -1;
+    int YId = -1;
+};
+
+struct Point {
+    double X, Y;     // coordinates
+    int ClusterId;     // no default cluster
+    
+    Point() : 
+        X(0.0), 
+        Y(0.0),
+        ClusterId(-1) {}
+        
+    Point(double x, double y) : 
+        X(x), 
+        Y(y),
+        ClusterId(-1) {}
+
+    double Distance(Point p) {
+        return sqrt((p.X - X) * (p.X - X) + (p.Y - Y) * (p.Y - Y));
+    }
+};
+
+struct Cluster {
+    int Id;
+    Point Centroid;
+    std::vector<Point> Points;
+
+    Cluster(int clusterId, Point centroid) :
+        Id(clusterId),
+        Centroid(centroid) {}
+};
+
 class CsvProcessor
 {
-    using CsvColumn = std::vector<double>; 
     public:
-        CsvProcessor(const std::string& filename, const std::vector<std::string>& neededCollumns = {"Creatinine_pvariance", "HCO3_mean"});
+        CsvProcessor(const std::string& filename, const std::string& columnX, const std::string& columnY);
         ~CsvProcessor() = default;
-
         bool GetIsReady() { return _ready; }
-
-        void PerformClusterization(uint32_t count);
-
-        std::map<uint32_t, CsvColumn>& GetData() { return _columnMap; }        
-        CsvColumn& GetColumn(const std::string& columnName) { return _columnMap[_titleMap[columnName]]; }
+        void PerformClusterization(uint32_t K);
+        std::vector<Cluster> GetCluseters() { return _clusters; }
 
     private:
-        void ReadFile(const std::string& filename, const std::vector<std::string>& neededCollumns);
-        void ClampToOne(const std::string& columnName);
-        // void 
-
+        void ReadFileAndNormalize(const std::string& filename, std::vector<Point>& points, GraphInfo& info);
+        void ClampToOne(std::vector<Point>& points, double maxX, double maxY);
+        
+        void PerformClusterization(uint32_t count, std::vector<Point>& points, std::vector<Cluster>& clusters);
+        int GetNearestClusterId(Point& point, std::vector<Cluster>& clusters);
+        void ClearClusterPoints(std::vector<Cluster>& clusters);
+        
     private:
         bool _ready = false;
         // threading and time
@@ -33,6 +69,8 @@ class CsvProcessor
 
         // csv data
         // std::vector
-        std::map<uint32_t, CsvColumn> _columnMap;
-        std::map<std::string, uint32_t> _titleMap;
+        std::vector<Point> _points;
+        std::vector<Cluster> _clusters;
+        GraphInfo _graphInfo;
+
 };
