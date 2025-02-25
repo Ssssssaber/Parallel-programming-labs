@@ -1,5 +1,5 @@
 # About
-Labaratory projects for parallel image prosessing and clustering
+Laboratory projects for parallel image processing and clustering
 
 # Usage
 #### App A
