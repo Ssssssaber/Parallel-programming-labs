@@ -13,7 +13,7 @@ Erosion
 app_b.exe {input.bmp} {output.bmp} {numThreads} [intencityThreshold] [erosionStep]
 ```
 #### App C
-Clusterization with Silhouette index
+K-means clusterization with Silhouette index output
 ```console
 app_c.exe [--csv input.csv] [--x name] [--y name] [--max uint] [--K uint] [--thrCount uint] [--outSVG out.svg]
 ```
