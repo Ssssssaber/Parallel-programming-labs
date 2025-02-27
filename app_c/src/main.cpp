@@ -38,7 +38,7 @@ void SeperateXandY(std::vector<Point>& points, std::vector<double>& x, std::vect
 int main(int argc, char* argv[]){
 
     std::string inputFilename = "csv/BD-Patients.csv";
-    std::string xColumn = "HCT_mean";
+    std::string xColumn = "Creatinine_pvariance";
     std::string yColumn = "HCO3_mean";
     uint32_t maxVectorCount = 5000;
     uint32_t K = 3;
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
     for (auto cluster = clusters.begin(); cluster != clusters.end(); cluster++)
     {   
         Point centroid = cluster->Centroid;
-        std::cout << "Cluster id: " << cluster->Id << "; Centroid (x, y): " << centroid.X << centroid.Y << "; " << std::endl;
+        std::cout << "Cluster id: " << cluster->Id << "; Centroid (x, y): " << centroid.X << "; " << centroid.Y << "; " << std::endl;
     }
     std::cout << "---------------------------------------------------------" << std::endl;
 

@@ -374,6 +374,6 @@ void CsvProcessor::ClampToOne(std::vector<Point>& points, double maxX, double ma
     for (auto it = points.begin(); it != points.end(); it++)
     {
         it->X /= maxX;
-        it->Y /= maxX;
+        it->Y /= maxY;
     }
 }
